@@ -74,12 +74,10 @@ export const getSuggestion = async (req, res, next) => {
       return createError(404, "Suggestion does'nt exists")
     }
     const user = await User.findById(req.body.userId)
-    res
-      .status(200)
-      .json({
-        ...suggestion._doc,
-        isLiked: user.likes.includes(suggestion._id)
-      })
+    res.status(200).json({
+      ...suggestion._doc,
+      isLiked: user.likes.includes(suggestion._id)
+    })
   } catch (err) {
     next(err)
   }
@@ -143,23 +141,57 @@ export const likeSuggestion = async (req, res, next) => {
   }
 }
 
-export const addNewComment = async(req,res,next) => {
-  const {suggestionId} = req.params
+export const addNewComment = async (req, res, next) => {
+  const { suggestionId } = req.params
 
   try {
     const suggestion = await Suggestion.findById(suggestionId)
     const user = await User.findById(req.body.userId)
     suggestion.comments.push({
-      user, replies: [], content: req.body.newComment
+      user,
+      replies: [],
+      content: req.body.newComment,
+      _id: new mongoose.Types.ObjectId
     })
     const updatedSuggestion = await suggestion.save()
     res.status(201).json(updatedSuggestion)
-
-  }catch(err){
+  } catch (err) {
     console.error(err)
   }
+}
+export const addReply = async (req, res, next) => {
+  const { suggestionId } = req.params
+  const { commentId, replyingTo, reply, userId } = req.body
 
+  try {
+    const suggestion = await Suggestion.findById(suggestionId)
+    const user = await User.findById(req.body.userId)
+    const updatedComments = suggestion.comments.map((comment, i) => {
+      if (comment._id.toString() === req.body.commentId) {
+        return {
+          ...comment._doc,
+          replies: [
+            ...comment.replies,
+            {
+              content: req.body.reply,
+              replyingTo: req.body.replyingTo,
+              user: {
+                image: user.image,
+                name: user.name,
+                username: user.username
+              },
+              _id: new mongoose.Types.ObjectId()
+            }
+          ]
+        }
+      } else return comment
+    })
 
-
-
+    console.log(updatedComments)
+    suggestion.comments = updatedComments
+    const updatedSuggestion = await suggestion.save()
+    res.status(201).json(updatedSuggestion)
+  } catch (err) {
+    console.error(err)
+  }
 }
