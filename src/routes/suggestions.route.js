@@ -1,10 +1,12 @@
 import express from 'express'
-import { addSuggestions, getSuggestion, getSuggestions } from '../controllers/suggestions.controller.js'
+import { addNewComment, addSuggestions, getSuggestion, getSuggestions, likeSuggestion } from '../controllers/suggestions.controller.js'
 
 const router = express.Router()
 
 router.post("/suggestions", getSuggestions)
+router.post("/suggestion/like/:suggestionId", likeSuggestion)
+router.post("/suggestion/:suggestionId", getSuggestion)
+router.post("/suggestion/addComment/:suggestionId", addNewComment)
 router.get("/suggestions/save", addSuggestions)
-router.get("/suggestion/:suggestionId", getSuggestion)
 
 export default router

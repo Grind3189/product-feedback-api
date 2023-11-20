@@ -26,20 +26,41 @@ export const getSuggestions = async (req, res, next) => {
       suggestions.sort((a, b) => b.upvotes - a.upvotes)
     }
 
+    let modifiedSuggestions
+
     if (req.body.userId) {
       const existerUser = await User.findById(req.body.userId)
       if (existerUser) {
-        return res.status(200).json({ currentUser: existerUser, suggestions })
+        modifiedSuggestions = suggestions.map((suggestion) => {
+          return {
+            ...suggestion._doc,
+            isLiked: existerUser.likes.includes(suggestion._id)
+          }
+        })
+        return res
+          .status(200)
+          .json({ currentUser: existerUser, suggestions: modifiedSuggestions })
       }
     }
+
+    modifiedSuggestions = suggestions.map((suggestion) => {
+      return {
+        ...suggestion._doc,
+        isLiked: false
+      }
+    })
+
     const newUser = new User({
       image: "",
       name: "guest",
-      username: "guest-" + nanoid(5)
+      username: "guest-" + nanoid(5),
+      likes: []
     })
 
     const savedUser = await newUser.save()
-    return res.status(201).json({ currentUser: savedUser, suggestions })
+    return res
+      .status(201)
+      .json({ currentUser: savedUser, suggestions: modifiedSuggestions })
   } catch (err) {
     next(err)
   }
@@ -47,15 +68,18 @@ export const getSuggestions = async (req, res, next) => {
 
 export const getSuggestion = async (req, res, next) => {
   const params = req.params.suggestionId
-  console.log(params)
   try {
     const suggestion = await Suggestion.findById(params)
-
     if (!suggestion) {
       return createError(404, "Suggestion does'nt exists")
     }
-
-    res.status(200).json(suggestion)
+    const user = await User.findById(req.body.userId)
+    res
+      .status(200)
+      .json({
+        ...suggestion._doc,
+        isLiked: user.likes.includes(suggestion._id)
+      })
   } catch (err) {
     next(err)
   }
@@ -88,4 +112,54 @@ export const addSuggestions = async (req, res, next) => {
   } catch (err) {
     console.error(err)
   }
+}
+
+export const likeSuggestion = async (req, res, next) => {
+  const { suggestionId } = req.params
+  const userId = req.body.userId
+  let isAdded = false
+  try {
+    const user = await User.findById(userId)
+    if (user.likes.includes(suggestionId)) {
+      const updatedLikes = user.likes.filter((like) => like !== suggestionId)
+      user.likes = updatedLikes
+    } else {
+      user.likes.push(suggestionId)
+      isAdded = true
+    }
+    const savedUser = await user.save()
+    const suggestion = await Suggestion.findByIdAndUpdate(
+      suggestionId,
+      { $inc: { upvotes: isAdded ? 1 : -1 } },
+      { new: true }
+    )
+    const modifedSuggestion = {
+      ...suggestion._doc,
+      isLiked: savedUser.likes.includes(suggestion._id)
+    }
+    res.status(200).json(modifedSuggestion)
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const addNewComment = async(req,res,next) => {
+  const {suggestionId} = req.params
+
+  try {
+    const suggestion = await Suggestion.findById(suggestionId)
+    const user = await User.findById(req.body.userId)
+    suggestion.comments.push({
+      user, replies: [], content: req.body.newComment
+    })
+    const updatedSuggestion = await suggestion.save()
+    res.status(201).json(updatedSuggestion)
+
+  }catch(err){
+    console.error(err)
+  }
+
+
+
+
 }
