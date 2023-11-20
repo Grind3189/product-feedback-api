@@ -6,10 +6,16 @@ import { createError } from "../utils/createError.js"
 import mongoose from "mongoose"
 
 export const getSuggestions = async (req, res, next) => {
-  const { sort } = req.query
+  const { sort, category } = req.query
 
   try {
-    const suggestions = await Suggestion.find()
+    let suggestions
+    if (category && category !== "All") {
+      suggestions = await Suggestion.find({ category: category.toLowerCase() })
+    } else {
+      suggestions = await Suggestion.find()
+    }
+
     if (sort === "Least Upvotes") {
       suggestions.sort((a, b) => a.upvotes - b.upvotes)
     } else if (sort === "Most Comments") {
@@ -38,6 +44,7 @@ export const getSuggestions = async (req, res, next) => {
     next(err)
   }
 }
+
 export const getSuggestion = async (req, res, next) => {
   const params = req.params.suggestionId
   console.log(params)

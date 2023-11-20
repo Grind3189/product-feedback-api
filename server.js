@@ -3,6 +3,7 @@ import dotenv from "dotenv"
 import mongoose from "mongoose"
 import cors from 'cors'
 import suggestionRoutes from "./src/routes/suggestions.route.js"
+import roadmapRoutes from "./src/routes/roadmap.route.js"
 
 const app = express()
 
@@ -11,6 +12,7 @@ app.use(cors())
 app.use(express.json())
 
 app.use("/api", suggestionRoutes)
+app.use("/api", roadmapRoutes)
 
 app.use((err, req, res, next) => {
   const errorStatus = err.status || 500
