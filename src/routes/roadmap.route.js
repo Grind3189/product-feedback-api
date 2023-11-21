@@ -3,6 +3,6 @@ import { getRoadmaps } from '../controllers/roadmap.controller.js'
 
 const router = express.Router()
 
-router.get("/roadmaps", getRoadmaps)
+router.get("/getAll", getRoadmaps)
 
 export default router
