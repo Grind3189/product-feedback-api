@@ -9,8 +9,6 @@ import mongoose from "mongoose"
 export const getSuggestions = async (req, res, next) => {
   const { sort, category } = req.query
 
-  console.log(req.userId)
-
   try {
     let suggestions
     if (category && category !== "All") {
@@ -79,7 +77,7 @@ export const getSuggestion = async (req, res, next) => {
   try {
     const suggestion = await Suggestion.findById(params)
     if (!suggestion) {
-      return createError(404, "Suggestion does'nt exists")
+      return next(createError(404, "Suggestion does'nt exists"))
     }
     const user = await User.findById(req.userId)
     res.status(200).json({
@@ -200,4 +198,18 @@ export const addReply = async (req, res, next) => {
   } catch (err) {
     console.error(err)
   }
+}
+
+export const addNewSuggestion = async (req, res, next) => {
+  const newFeedbackData = req.body.newFeedbackData
+
+  const newSuggestion = new Suggestion({
+    ...newFeedbackData,
+    status: "suggestion",
+    upvotes: 0,
+    comments: []
+  })
+
+  await newSuggestion.save()
+  res.status(201).send("New suggestion added")
 }
