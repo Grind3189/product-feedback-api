@@ -8,6 +8,7 @@ const suggestionSchema = new Schema ({
     description: String,
     status: String,
     upvotes: Number,
+    userId: Schema.Types.ObjectId,
     comments: [{
         _id: Schema.ObjectId,
         content: String,

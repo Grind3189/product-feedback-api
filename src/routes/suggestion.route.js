@@ -2,6 +2,8 @@ import express from "express"
 import {
   addNewSuggestion,
   addSuggestions,
+  deleteSuggestion,
+  editSuggestion,
   getSuggestion,
   getSuggestions,
   likeSuggestion
@@ -12,7 +14,9 @@ const router = express.Router()
 
 router.get("/getAll", hasCookie, getSuggestions)
 router.get("/like/:suggestionId", hasCookie, likeSuggestion)
-router.post("/addSuggestion", addNewSuggestion)
+router.post("/addSuggestion", hasCookie, addNewSuggestion)
+router.post("/edit/:suggestionId", hasCookie, editSuggestion)
+router.delete("/delete/:suggestionId", hasCookie, deleteSuggestion)
 router.get("/:suggestionId", hasCookie, getSuggestion)
 // router.get("/save", addSuggestions)
 

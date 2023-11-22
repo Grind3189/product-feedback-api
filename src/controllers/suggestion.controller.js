@@ -38,7 +38,9 @@ export const getSuggestions = async (req, res, next) => {
             isLiked: existerUser.likes.includes(suggestion._id)
           }
         })
-        return res.status(200).json({currentUser: existerUser, suggestions: modifiedSuggestions })
+        return res
+          .status(200)
+          .json({ currentUser: existerUser, suggestions: modifiedSuggestions })
       }
     }
 
@@ -82,7 +84,7 @@ export const getSuggestion = async (req, res, next) => {
     const user = await User.findById(req.userId)
     res.status(200).json({
       ...suggestion._doc,
-      isLiked:  user?.likes?.includes(suggestion._id) || false
+      isLiked: user?.likes?.includes(suggestion._id) || false
     })
   } catch (err) {
     next(err)
@@ -146,7 +148,6 @@ export const likeSuggestion = async (req, res, next) => {
   }
 }
 
-
 export const addNewSuggestion = async (req, res, next) => {
   const newFeedbackData = req.body.newFeedbackData
 
@@ -154,9 +155,42 @@ export const addNewSuggestion = async (req, res, next) => {
     ...newFeedbackData,
     status: "suggestion",
     upvotes: 0,
-    comments: []
+    comments: [],
+    userId: req.userId
   })
 
   await newSuggestion.save()
   res.status(201).send("New suggestion added")
+}
+
+export const editSuggestion = async (req, res, next) => {
+  const { suggestionId } = req.params
+  const { title, category, description } = req.body
+  const suggestion = await Suggestion.findById(suggestionId)
+
+  if (!suggestion) return next(createError(404, "Suggestion not found"))
+  if (suggestion.userId?.toString() !== req.userId)
+    return next(createError(403, "You can only edit your own suggestion"))
+
+  suggestion.title = title
+  suggestion.category = category
+  suggestion.description = description
+
+  const updatedSuggestion = await suggestion.save()
+
+  res.status(201).json(updatedSuggestion)
+}
+
+export const deleteSuggestion = async (req, res, next) => {
+  const { suggestionId } = req.params
+
+  const suggestion = await Suggestion.findById(suggestionId)
+
+  if (!suggestion) return next(createError(404, "Suggestion not found."))
+  if (suggestion.userId.toString() !== req.userId)
+    return next(createError(403, "You can only delete your own suggestion."))
+
+   await Suggestion.findByIdAndDelete(suggestionId)
+   
+   res.status(200).send("Successfully deleted")
 }
