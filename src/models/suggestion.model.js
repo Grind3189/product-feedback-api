@@ -23,7 +23,8 @@ const suggestionSchema = new Schema ({
             user: {
                 image: String,
                 name: String,
-                username: String
+                username: String,
+                userId: Schema.Types.ObjectId
             }
         }]
     }]

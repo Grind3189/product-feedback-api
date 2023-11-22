@@ -43,7 +43,8 @@ export const addReply = async (req, res, next) => {
               user: {
                 image: user.image,
                 name: user.name,
-                username: user.username
+                username: user.username,
+                userId: user._id
               },
               _id: new mongoose.Types.ObjectId()
             }
@@ -61,27 +62,28 @@ export const addReply = async (req, res, next) => {
 }
 
 export const deleteComment = async (req, res, next) => {
-  const { suggestionId, commentId } = req.query
+  const { commentId } = req.query
+  const { suggestionId } = req.params
   let updatedComments
   let error = false
 
   try {
     const suggestion = await Suggestion.findById(suggestionId)
-    
+
     if (!suggestion) {
       return next(createError(404, "Suggestion does'nt exists"))
     }
-    
+
     const comments = suggestion.comments
-    
+
     comments.forEach((comment) => {
       if (comment._id.toString() === commentId) {
-
         if (comment.user.userId?.toString() === req.userId) {
           //Delete if the userId and userId from cookies matched
-          updatedComments = comments.filter(comment => comment._id.toString() !== commentId)
+          updatedComments = comments.filter(
+            (comment) => comment._id.toString() !== commentId
+          )
           suggestion.comments = updatedComments
-
         } else {
           error = true
           return next(createError(403, "You can only delete your own comment"))
@@ -89,13 +91,57 @@ export const deleteComment = async (req, res, next) => {
       }
     })
 
-    if(!error) {
+    if (!error) {
       const updatedSuggestion = await suggestion.save()
       res.status(200).json(updatedSuggestion)
     }
-    
-
   } catch (err) {
     console.error(err)
   }
+}
+
+export const deleteReply = async (req, res, next) => {
+  const { suggestionId } = req.params
+  const { commentId, replyId } = req.query
+  let updatedComments
+  let error = false
+
+  const suggestion = await Suggestion.findById(suggestionId)
+
+  if (!suggestion) {
+    return next(createError(404, "Suggestion not found"))
+  }
+
+  const comments = suggestion.comments
+
+  comments.forEach((comment) => {
+    if (comment._id.toString() === commentId) {
+      comment.replies.forEach((reply) => {
+        if (reply._id.toString() === replyId) {
+          if (reply.user.userId.toString() === req.userId) {
+            updatedComments = comments.map((comment) => {
+              if (comment._id.toString() === commentId) {
+                return {
+                  ...comment._doc,
+                  replies: comment.replies.filter(
+                    (reply) => reply._id.toString() !== replyId
+                  )
+                }
+              } else return comment
+            })
+          } else {
+            error = true
+            return next(createError(403, "You can only delete your own reply"))
+          }
+        }
+      })
+    }
+  })
+
+  if(!error) {
+    suggestion.comments = updatedComments
+    const updatedSuggestion = await suggestion.save()
+    res.status(200).json(updatedSuggestion)
+  }
+
 }

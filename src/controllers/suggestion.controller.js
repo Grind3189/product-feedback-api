@@ -82,7 +82,7 @@ export const getSuggestion = async (req, res, next) => {
     const user = await User.findById(req.userId)
     res.status(200).json({
       ...suggestion._doc,
-      isLiked: user.likes.includes(suggestion._id)
+      isLiked:  user?.likes?.includes(suggestion._id) || false
     })
   } catch (err) {
     next(err)
