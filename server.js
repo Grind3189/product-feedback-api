@@ -4,6 +4,7 @@ import mongoose from "mongoose"
 import cors from 'cors'
 import suggestionRoutes from "./src/routes/suggestion.route.js"
 import roadmapRoutes from "./src/routes/roadmap.route.js"
+import commentRoutes from './src/routes/comment.route.js'
 import cookieParser from 'cookie-parser'
 
 const app = express()
@@ -19,6 +20,7 @@ app.use(cors(corsOptions))
 app.use(express.json())
 
 app.use("/api/suggestion", suggestionRoutes)
+app.use("/api/comment", commentRoutes)
 app.use("/api/roadmap", roadmapRoutes)
 
 app.use((err, req, res, next) => {

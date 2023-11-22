@@ -38,7 +38,7 @@ export const getSuggestions = async (req, res, next) => {
             isLiked: existerUser.likes.includes(suggestion._id)
           }
         })
-        return res.status(200).json({ suggestions: modifiedSuggestions })
+        return res.status(200).json({currentUser: existerUser, suggestions: modifiedSuggestions })
       }
     }
 
@@ -146,59 +146,6 @@ export const likeSuggestion = async (req, res, next) => {
   }
 }
 
-export const addNewComment = async (req, res, next) => {
-  const { suggestionId } = req.params
-
-  try {
-    const suggestion = await Suggestion.findById(suggestionId)
-    const user = await User.findById(req.userId)
-    suggestion.comments.push({
-      user,
-      replies: [],
-      content: req.body.newComment,
-      _id: new mongoose.Types.ObjectId()
-    })
-    const updatedSuggestion = await suggestion.save()
-    res.status(201).json(updatedSuggestion)
-  } catch (err) {
-    console.error(err)
-  }
-}
-export const addReply = async (req, res, next) => {
-  const { suggestionId } = req.params
-  const { commentId, replyingTo, reply } = req.body
-
-  try {
-    const suggestion = await Suggestion.findById(suggestionId)
-    const user = await User.findById(req.userId)
-    const updatedComments = suggestion.comments.map((comment, i) => {
-      if (comment._id.toString() === commentId) {
-        return {
-          ...comment._doc,
-          replies: [
-            ...comment.replies,
-            {
-              content: reply,
-              replyingTo,
-              user: {
-                image: user.image,
-                name: user.name,
-                username: user.username
-              },
-              _id: new mongoose.Types.ObjectId()
-            }
-          ]
-        }
-      } else return comment
-    })
-
-    suggestion.comments = updatedComments
-    const updatedSuggestion = await suggestion.save()
-    res.status(201).json(updatedSuggestion)
-  } catch (err) {
-    console.error(err)
-  }
-}
 
 export const addNewSuggestion = async (req, res, next) => {
   const newFeedbackData = req.body.newFeedbackData
