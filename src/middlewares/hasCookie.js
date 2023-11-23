@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken"
 import User from "../models/user.model.js"
-import { nanoid } from "nanoid"
+import { generateId } from "../utils/generateId.js"
 
 export const hasCookie = async (req, res, next) => {
   let token = req.cookies.accessToken
@@ -9,7 +9,7 @@ export const hasCookie = async (req, res, next) => {
     const newUser = new User({
       image: "",
       name: "guest",
-      username: "guest-" + nanoid(5),
+      username: "guest-" + generateId(),
       likes: []
     })
     const savedUser = await newUser.save()

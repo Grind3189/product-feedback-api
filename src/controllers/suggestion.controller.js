@@ -1,9 +1,9 @@
-import { nanoid } from "nanoid"
+
 import { createError } from "../utils/createError.js"
 import jwt from "jsonwebtoken"
 import Suggestion from "../models/suggestion.model.js"
 import User from "../models/user.model.js"
-import mongoose from "mongoose"
+import { generateId } from "../utils/generateId.js"
 
 export const getSuggestions = async (req, res, next) => {
   const { sort, category } = req.query
@@ -53,7 +53,7 @@ export const getSuggestions = async (req, res, next) => {
     const newUser = new User({
       image: "",
       name: "guest",
-      username: "guest-" + nanoid(5),
+      username: "guest-" + generateId(),
       likes: []
     })
 
