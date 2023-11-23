@@ -116,7 +116,7 @@ export const addSuggestions = async (req, res, next) => {
       await newSuggestion.save()
     }
   } catch (err) {
-    console.error(err)
+    next(err)
   }
 }
 
@@ -144,7 +144,7 @@ export const likeSuggestion = async (req, res, next) => {
     }
     res.status(200).json(modifedSuggestion)
   } catch (err) {
-    console.error(err)
+    next(err)
   }
 }
 

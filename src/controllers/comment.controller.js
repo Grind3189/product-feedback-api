@@ -20,7 +20,7 @@ export const addNewComment = async (req, res, next) => {
     const updatedSuggestion = await suggestion.save()
     res.status(201).json(updatedSuggestion)
   } catch (err) {
-    console.error(err)
+    next(err)
   }
 }
 
@@ -57,7 +57,7 @@ export const addReply = async (req, res, next) => {
     const updatedSuggestion = await suggestion.save()
     res.status(201).json(updatedSuggestion)
   } catch (err) {
-    console.error(err)
+    next(err)
   }
 }
 
@@ -96,7 +96,7 @@ export const deleteComment = async (req, res, next) => {
       res.status(200).json(updatedSuggestion)
     }
   } catch (err) {
-    console.error(err)
+    next(err)
   }
 }
 
