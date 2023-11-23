@@ -64,8 +64,7 @@ export const getSuggestions = async (req, res, next) => {
       .cookie("accessToken", token, {
         httpOnly: true,
         secure: true,
-        sameSite: "None",
-        origin: "https://product-feedback-bygrind.netlify.app"
+        sameSite: "None"
       })
       .status(201)
       .json({ currentUser: savedUser, suggestions: modifiedSuggestions })

@@ -18,8 +18,7 @@ export const hasCookie = async (req, res, next) => {
     res.cookie("accessToken", token, {
       httpOnly: true,
       secure: true,
-      sameSite: "None",
-      origin: "https://product-feedback-bygrind.netlify.app"
+      sameSite: "None"
     })
     req.userId = savedUser._id
     return next()
