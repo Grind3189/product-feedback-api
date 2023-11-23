@@ -11,7 +11,7 @@ import helmet from "helmet"
 const app = express()
 const corsOptions = {
   credentials: true,
-  origin: 'http://localhost:5173',
+  origin: ['http://localhost:5173', 'https://product-feedback-bygrind.netlify.app'],
   methods: 'GET, POST, DELETE, PUT',  
 }
 
