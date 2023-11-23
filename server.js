@@ -6,6 +6,7 @@ import suggestionRoutes from "./src/routes/suggestion.route.js"
 import roadmapRoutes from "./src/routes/roadmap.route.js"
 import commentRoutes from './src/routes/comment.route.js'
 import cookieParser from 'cookie-parser'
+import helmet from "helmet"
 
 const app = express()
 const corsOptions = {
@@ -15,6 +16,7 @@ const corsOptions = {
 }
 
 dotenv.config()
+app.use(helmet())
 app.use(cookieParser())
 app.use(cors(corsOptions))
 app.use(express.json())
