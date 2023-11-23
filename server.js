@@ -10,15 +10,15 @@ import helmet from "helmet"
 
 const app = express()
 const corsOptions = {
-  credentials: true,
   origin: 'https://product-feedback-bygrind.netlify.app',
   methods: 'GET, POST, DELETE, PUT',  
+  credentials: true,
 }
 
 dotenv.config()
+app.use(cors(corsOptions))
 app.use(helmet())
 app.use(cookieParser())
-app.use(cors(corsOptions))
 app.use(express.json())
 
 app.use("/api/suggestion", suggestionRoutes)
