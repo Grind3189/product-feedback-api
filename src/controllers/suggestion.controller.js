@@ -3,7 +3,6 @@ import { createError } from "../utils/createError.js"
 import jwt from "jsonwebtoken"
 import Suggestion from "../models/suggestion.model.js"
 import User from "../models/user.model.js"
-import data from "../data.json" assert { type: "json" }
 import mongoose from "mongoose"
 
 export const getSuggestions = async (req, res, next) => {
@@ -86,35 +85,6 @@ export const getSuggestion = async (req, res, next) => {
       ...suggestion._doc,
       isLiked: user?.likes?.includes(suggestion._id) || false
     })
-  } catch (err) {
-    next(err)
-  }
-}
-
-export const addSuggestions = async (req, res, next) => {
-  try {
-    for (const suggestion of data.productRequests) {
-      const { title, category, description, status, upvotes, comments } =
-        suggestion
-      const newSuggestion = new Suggestion({
-        title,
-        category,
-        description,
-        status,
-        upvotes,
-        comments: comments
-          ? comments.map((comment) => {
-              return {
-                ...comment,
-                _id: new mongoose.Types.ObjectId(),
-                replies: comment.replies ? comment.replies : []
-              }
-            })
-          : []
-      })
-
-      await newSuggestion.save()
-    }
   } catch (err) {
     next(err)
   }

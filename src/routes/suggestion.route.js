@@ -1,7 +1,6 @@
 import express from "express"
 import {
   addNewSuggestion,
-  addSuggestions,
   deleteSuggestion,
   editSuggestion,
   getSuggestion,
@@ -18,6 +17,5 @@ router.post("/addSuggestion", hasCookie, addNewSuggestion)
 router.post("/edit/:suggestionId", hasCookie, editSuggestion)
 router.delete("/delete/:suggestionId", hasCookie, deleteSuggestion)
 router.get("/:suggestionId", hasCookie, getSuggestion)
-// router.get("/save", addSuggestions)
 
 export default router

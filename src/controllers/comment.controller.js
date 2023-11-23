@@ -1,4 +1,3 @@
-import { query } from "express"
 import Suggestion from "../models/suggestion.model.js"
 import User from "../models/user.model.js"
 import { createError } from "../utils/createError.js"
